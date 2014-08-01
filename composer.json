@@ -1,0 +1,18 @@
+{
+	"name": "famex/yql-woeidfinder",
+	"authors": [
+		{
+			"name": "Dominik Schwind",
+			"homepage": "http://dominikschwind.com",
+			"role": "Developer"
+		}
+	],
+	"version": "0.0.x",
+	"require": {
+		"php": ">=5.3.0"
+	},
+	"target-dir": "Famex/Yql-woeidfinder",
+	"autoload": {
+		"psr-0": {"Famex\\YqlWoeidFinder": ""}
+	}
+}
