@@ -11,8 +11,7 @@
 	"require": {
 		"php": ">=5.3.0"
 	},
-	"target-dir": "Famex/Yql-woeidfinder",
 	"autoload": {
-		"psr-0": {"Famex\\YqlWoeidFinder": ""}
+		"psr-0": {"Famex\\YqlWoeidFinder": "src/"}
 	}
 }
