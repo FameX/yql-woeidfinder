@@ -86,16 +86,24 @@ class YqlWoeidFinder {
             $city_woeid_result = json_decode($this->_queryYql($query));
             $city_woeid_result = $city_woeid_result->query->results->place;
 
-            $woeid = new WoEID();
-            $woeid->woeid = $city_woeid_result->woeid;
-            if(isset($city_woeid_result->boundingBox))   $woeid->boundingBox = $city_woeid_result->boundingBox;
-            if(isset($city_woeid_result->centroid))      $woeid->centroid = $city_woeid_result->centroid;
-            if(isset($city_woeid_result->placeTypeName)) $woeid->type = $city_woeid_result->placeTypeName->content;
-            $woeid->content = $city_woeid_result->name;
+            $okay_codes = array(7,22,10);
+
+            if(
+                isset($city_woeid_result->placeTypeName) &&
+                isset($city_woeid_result->placeTypeName->code) &&
+                in_array($city_woeid_result->placeTypeName->code,$okay_codes)){
+                    $woeid = new WoEID();
+                    $woeid->woeid = $city_woeid_result->woeid;
+                    if(isset($city_woeid_result->boundingBox))   $woeid->boundingBox = $city_woeid_result->boundingBox;
+                    if(isset($city_woeid_result->centroid))      $woeid->centroid = $city_woeid_result->centroid;
+                    if(isset($city_woeid_result->placeTypeName)) $woeid->type = $city_woeid_result->placeTypeName->content;
+                    $woeid->content = $city_woeid_result->name;
 
 
-            $place->locality1 = $woeid;
-            unset($woeid);
+                    $place->locality1 = $woeid;
+                    unset($woeid);
+            }
+
         }
 
         return $place;
