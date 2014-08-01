@@ -78,6 +78,26 @@ class YqlWoeidFinder {
             }
         }
 
+        if(!isset($place->locality1) && (isset($place_result->city)) && (isset($place_result->country))){
+            $query = sprintf("select * from geo.placefinder where text=\"%s, %s\"",$place_result->city,$place_result->country);
+            $city_result = json_decode($this->_queryYql($query));
+            $city_result = $city_result->query->results->Result;
+            $query = sprintf("select * from geo.places where woeid = %s;",$city_result->woeid);
+            $city_woeid_result = json_decode($this->_queryYql($query));
+            $city_woeid_result = $city_woeid_result->query->results->place;
+
+            $woeid = new WoEID();
+            $woeid->woeid = $city_woeid_result->woeid;
+            if(isset($city_woeid_result->boundingBox))   $woeid->boundingBox = $city_woeid_result->boundingBox;
+            if(isset($city_woeid_result->centroid))      $woeid->centroid = $city_woeid_result->centroid;
+            if(isset($city_woeid_result->placeTypeName)) $woeid->type = $city_woeid_result->placeTypeName->content;
+            $woeid->content = $city_woeid_result->name;
+
+
+            $place->locality1 = $woeid;
+            unset($woeid);
+        }
+
         return $place;
     }
 
