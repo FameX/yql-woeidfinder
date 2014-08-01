@@ -63,7 +63,7 @@ class YqlWoeidFinder {
         unset($woeid);
 
         $woeid_types = array(
-          'country','admin1','admin2','admin3','locality1','locality2','postal'
+          'country','admin1','admin2','admin3','locality1','locality2','postal','timezone'
         );
 
         foreach($woeid_types as $woeid_type){
