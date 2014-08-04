@@ -85,14 +85,18 @@ class YqlWoeidFinder
             $city_result = json_decode($this->_queryYql($query));
             $mindist = 420000;
             $minkey = 0;
-            foreach ($city_result->query->results->Result as $key => $value) {
+            $city_results = $city_result->query->results->Result;
+            if(!is_array($city_result)){
+                $city_results = array($city_results);
+            }
+            foreach ($city_results as $key => $value) {
                 $dist = $this->_latLongDistance($lat,$long,$value->latitude,$value->longitude);
                 if($dist < $mindist){
                     $minkey = $key;
                     $mindist = $dist;
                 }
             }
-            $city_result = $city_result->query->results->Result[$minkey];
+            $city_result = $city_results[$minkey];
             $query = sprintf("select * from geo.places where woeid = %s;", $city_result->woeid);
             $city_woeid_result = json_decode($this->_queryYql($query));
             $city_woeid_result = $city_woeid_result->query->results->place;
