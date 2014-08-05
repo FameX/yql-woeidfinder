@@ -86,7 +86,7 @@ class YqlWoeidFinder
             $mindist = 420000;
             $minkey = 0;
             $city_results = $city_result->query->results->Result;
-            if(!is_array($city_result)){
+            if(!is_array($city_results)){
                 $city_results = array($city_results);
             }
             foreach ($city_results as $key => $value) {
