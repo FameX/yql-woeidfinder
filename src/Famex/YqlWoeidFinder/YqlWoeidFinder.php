@@ -47,83 +47,91 @@ class YqlWoeidFinder
             throw new \Exception();
         }
 
+		return self::getPlaceFromWoeid($place_result->woeid);
 
-        $query = sprintf("select * from geo.places where woeid = %s;", $place_result->woeid);
-        $woeid_result = json_decode($this->_queryYql($query));
-        $woeid_result = $woeid_result->query->results->place;
-
-        $place = new Place();
-
-        $woeid = new WoEID();
-        $woeid->woeid = $woeid_result->woeid;
-        if (isset($woeid_result->boundingBox)) $woeid->boundingBox = $woeid_result->boundingBox;
-        if (isset($woeid_result->centroid)) $woeid->centroid = $woeid_result->centroid;
-        if (isset($woeid_result->placeTypeName)) $woeid->type = $woeid_result->placeTypeName->content;
-        $woeid->content = $woeid_result->name;
-        $place->setWoeid($woeid);
-
-        unset($woeid);
-
-        $woeid_types = array(
-            'country', 'admin1', 'admin2', 'admin3', 'locality1', 'locality2', 'postal', 'timezone'
-        );
-
-        foreach ($woeid_types as $woeid_type) {
-            if (isset($woeid_result->$woeid_type)) {
-                $woeid = new WoEID();
-                if (isset($woeid_result->$woeid_type->code)) $woeid->code = $woeid_result->$woeid_type->code;
-                if (isset($woeid_result->$woeid_type->type)) $woeid->type = $woeid_result->$woeid_type->type;
-                if (isset($woeid_result->$woeid_type->woeid)) $woeid->woeid = $woeid_result->$woeid_type->woeid;
-                if (isset($woeid_result->$woeid_type->content)) $woeid->content = $woeid_result->$woeid_type->content;
-                $place->set($woeid_type, $woeid);
-                unset($woeid);
-            }
-        }
-
-        if (!isset($place->locality1) && (isset($place_result->city)) && (isset($place_result->country))) {
-            $query = sprintf("select * from geo.placefinder where text=\"%s, %s\"", $place_result->city, $place_result->country);
-            $city_result = json_decode($this->_queryYql($query));
-            $mindist = 420000;
-            $minkey = 0;
-            $city_results = $city_result->query->results->Result;
-            if(!is_array($city_results)){
-                $city_results = array($city_results);
-            }
-            foreach ($city_results as $key => $value) {
-                $dist = $this->_latLongDistance($lat,$long,$value->latitude,$value->longitude);
-                if($dist < $mindist){
-                    $minkey = $key;
-                    $mindist = $dist;
-                }
-            }
-            $city_result = $city_results[$minkey];
-            $query = sprintf("select * from geo.places where woeid = %s;", $city_result->woeid);
-            $city_woeid_result = json_decode($this->_queryYql($query));
-            $city_woeid_result = $city_woeid_result->query->results->place;
-
-            $okay_codes = array(7, 22, 10);
-
-            if (
-                isset($city_woeid_result->placeTypeName) &&
-                isset($city_woeid_result->placeTypeName->code) &&
-                in_array($city_woeid_result->placeTypeName->code, $okay_codes)
-            ) {
-                $woeid = new WoEID();
-                $woeid->woeid = $city_woeid_result->woeid;
-                if (isset($city_woeid_result->boundingBox)) $woeid->boundingBox = $city_woeid_result->boundingBox;
-                if (isset($city_woeid_result->centroid)) $woeid->centroid = $city_woeid_result->centroid;
-                if (isset($city_woeid_result->placeTypeName)) $woeid->type = $city_woeid_result->placeTypeName->content;
-                $woeid->content = $city_woeid_result->name;
-
-
-                $place->locality1 = $woeid;
-                unset($woeid);
-            }
-
-        }
-
-        return $place;
     }
+
+	/**
+	 * @param $woeid
+	 * @return \Famex\YqlWoeidFinder\Place Place
+	 */
+	public function getPlaceFromWoeid($woeid){
+		$query = sprintf("select * from geo.places where woeid = %s;", $woeid);
+		$woeid_result = json_decode($this->_queryYql($query));
+		$woeid_result = $woeid_result->query->results->place;
+
+		$place = new Place();
+
+		$woeid = new WoEID();
+		$woeid->woeid = $woeid_result->woeid;
+		if (isset($woeid_result->boundingBox)) $woeid->boundingBox = $woeid_result->boundingBox;
+		if (isset($woeid_result->centroid)) $woeid->centroid = $woeid_result->centroid;
+		if (isset($woeid_result->placeTypeName)) $woeid->type = $woeid_result->placeTypeName->content;
+		$woeid->content = $woeid_result->name;
+		$place->setWoeid($woeid);
+
+		unset($woeid);
+
+		$woeid_types = array(
+			'country', 'admin1', 'admin2', 'admin3', 'locality1', 'locality2', 'postal', 'timezone'
+		);
+
+		foreach ($woeid_types as $woeid_type) {
+			if (isset($woeid_result->$woeid_type)) {
+				$woeid = new WoEID();
+				if (isset($woeid_result->$woeid_type->code)) $woeid->code = $woeid_result->$woeid_type->code;
+				if (isset($woeid_result->$woeid_type->type)) $woeid->type = $woeid_result->$woeid_type->type;
+				if (isset($woeid_result->$woeid_type->woeid)) $woeid->woeid = $woeid_result->$woeid_type->woeid;
+				if (isset($woeid_result->$woeid_type->content)) $woeid->content = $woeid_result->$woeid_type->content;
+				$place->set($woeid_type, $woeid);
+				unset($woeid);
+			}
+		}
+
+		if (!isset($place->locality1) && (isset($place_result->city)) && (isset($place_result->country))) {
+			$query = sprintf("select * from geo.placefinder where text=\"%s, %s\"", $place_result->city, $place_result->country);
+			$city_result = json_decode($this->_queryYql($query));
+			$mindist = 420000;
+			$minkey = 0;
+			$city_results = $city_result->query->results->Result;
+			if(!is_array($city_results)){
+				$city_results = array($city_results);
+			}
+			foreach ($city_results as $key => $value) {
+				$dist = $this->_latLongDistance($lat,$long,$value->latitude,$value->longitude);
+				if($dist < $mindist){
+					$minkey = $key;
+					$mindist = $dist;
+				}
+			}
+			$city_result = $city_results[$minkey];
+			$query = sprintf("select * from geo.places where woeid = %s;", $city_result->woeid);
+			$city_woeid_result = json_decode($this->_queryYql($query));
+			$city_woeid_result = $city_woeid_result->query->results->place;
+
+			$okay_codes = array(7, 22, 10);
+
+			if (
+				isset($city_woeid_result->placeTypeName) &&
+				isset($city_woeid_result->placeTypeName->code) &&
+				in_array($city_woeid_result->placeTypeName->code, $okay_codes)
+			) {
+				$woeid = new WoEID();
+				$woeid->woeid = $city_woeid_result->woeid;
+				if (isset($city_woeid_result->boundingBox)) $woeid->boundingBox = $city_woeid_result->boundingBox;
+				if (isset($city_woeid_result->centroid)) $woeid->centroid = $city_woeid_result->centroid;
+				if (isset($city_woeid_result->placeTypeName)) $woeid->type = $city_woeid_result->placeTypeName->content;
+				$woeid->content = $city_woeid_result->name;
+
+
+				$place->locality1 = $woeid;
+				unset($woeid);
+			}
+
+		}
+
+		return $place;
+	}
 
     protected function _queryYql($query)
     {
