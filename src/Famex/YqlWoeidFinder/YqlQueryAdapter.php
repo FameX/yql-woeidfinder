@@ -52,6 +52,11 @@ class YqlQueryAdapter {
 		$this->cache = $cache;
 	}
 
+	/**
+	 * @param $query
+	 * @return stdClass
+	 * @throws Exception
+	 */
 	public function queryYql($query)
 	{
 		if($this->browser == null){
