@@ -133,6 +133,10 @@ class YqlWoeidFinder
 		return $place;
 	}
 
+	/**
+	 * @param $woeid
+	 * @return \Famex\YqlWoeidFinder\Place[] Neighbors
+	 */
 	public function getNeighborsFromWoeid($woeid){
 		$query = sprintf("select woeid from geo.places.neighbors where neighbor_woeid = \"%s\"", $woeid);
 		$result = json_decode($this->_queryYql($query));
@@ -151,6 +155,10 @@ class YqlWoeidFinder
 		return $neighbors;
 	}
 
+	/**
+	 * @param $woeid
+	 * @return \Famex\YqlWoeidFinder\Place[] Siblings
+	 */
 	public function getSiblingsFromWoeid($woeid){
 		$query = sprintf("select woeid from geo.places.siblings where sibling_woeid = \"%s\"", $woeid);
 		$result = json_decode($this->_queryYql($query));
@@ -169,6 +177,10 @@ class YqlWoeidFinder
 		return $siblings;
 	}
 
+	/**
+	 * @param $woeid
+	 * @return \Famex\YqlWoeidFinder\Place[] Children
+	 */
 	public function getChildrenFromWoeid($woeid){
 		$query = sprintf("select woeid from geo.places.children where parent_woeid = \"%s\"", $woeid);
 		$result = json_decode($this->_queryYql($query));
