@@ -133,6 +133,16 @@ class YqlWoeidFinder
 		return $place;
 	}
 
+	public function getNeighborsFromWoeid($woeid){
+		$query = sprintf("select woeid from geo.places.neighbors where neighbor_woeid = \"%s\"", $woeid);
+		$result = json_decode($this->_queryYql($query));
+		$neighbors = array();
+		foreach($result->query->results->place as $result){
+			$neighbors[] = $this->getPlaceFromWoeid($result->woeid);
+		}
+		return $neighbors;
+	}
+
     protected function _queryYql($query)
     {
         if ($this->browser === false) {
