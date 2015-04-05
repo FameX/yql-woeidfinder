@@ -3,6 +3,7 @@ namespace Famex\YqlWoeidFinder;
 
 use Buzz\Browser;
 use Buzz\Client\Curl;
+use Buzz\Exception\RequestException;
 use Famex\YqlWoeidFinder\YqlQueryAdapter\Exception;
 
 /**
@@ -72,9 +73,13 @@ class YqlQueryAdapter {
 			return json_decode($content);
 		}
 
-		$result = $this->browser->get($yqlquery);
+		try{
+			$result = $this->browser->get($yqlquery);
+		} catch (RequestException $e){
+			throw new Exception("Unable to connect to the YQL service.",500,$e);
+		}
 		if(!$result->isOk()){
-			throw new Exception($result->getgetReasonPhrase(),$result->getStatusCode());
+			throw new Exception($result->getReasonPhrase(),$result->getStatusCode());
 		}
 		$content = $result->getContent();
 
