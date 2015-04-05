@@ -1,18 +1,21 @@
 {
-	"name": "famex/yql-woeidfinder",
-	"authors": [
-		{
-			"name": "Dominik Schwind",
-			"homepage": "http://dominikschwind.com",
-			"role": "Developer"
-		}
-	],
-	"version": "0.1.3",
-	"require": {
-		"php": ">=5.3.0",
-        "kriswallsmith/buzz": ">= 0.11"
-	},
-	"autoload": {
-		"psr-0": {"Famex\\YqlWoeidFinder": "src/"}
-	}
+  "name": "famex/yql-woeidfinder",
+  "authors": [
+    {
+      "name": "Dominik Schwind",
+      "homepage": "http://dominikschwind.com",
+      "role": "Developer"
+    }
+  ],
+  "version": "0.1.3",
+  "require": {
+    "php": ">=5.3.0",
+    "kriswallsmith/buzz": ">= 0.11"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "4.6.*"
+  },
+  "autoload": {
+    "psr-0": {"Famex\\YqlWoeidFinder": "src/"}
+  }
 }
