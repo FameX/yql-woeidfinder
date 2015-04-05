@@ -1,33 +1,33 @@
 <?php
 namespace Famex\YqlWoeidFinder;
 
-use Buzz\Browser;
-use Buzz\Client\Curl;
-
+/**
+ * Class YqlWoeidFinder
+ * @package Famex\YqlWoeidFinder
+ */
 class YqlWoeidFinder
 {
-    protected $cache = false;
-    protected $browser = false;
 
-    public function getBrowser()
-    {
-        return $this->browser;
-    }
+	/**
+	 * @var YqlQueryAdapter
+	 */
+	protected $adapter;
 
-    public function setBrowser($browser)
-    {
-        $this->browser = $browser;
-    }
+	/**
+	 * @return YqlQueryAdapter
+	 */
+	public function getAdapter()
+	{
+		return $this->adapter;
+	}
 
-    public function getCache()
-    {
-        return $this->cache;
-    }
-
-    public function setCache($cache)
-    {
-        $this->cache = $cache;
-    }
+	/**
+	 * @param YqlQueryAdapter $adapter
+	 */
+	public function setAdapter($adapter)
+	{
+		$this->adapter = $adapter;
+	}
 
     /**
      * @param $lat
@@ -39,7 +39,7 @@ class YqlWoeidFinder
 
         $query = sprintf("select * from geo.placefinder where text=\"%s,%s\" and gflags=\"R\"", $lat, $long);
 
-        $place_result = json_decode($this->_queryYql($query));
+        $place_result = $this->_queryYql($query);
 
 		if($place_result->query->results == null){
 			throw new \Exception();
@@ -64,7 +64,7 @@ class YqlWoeidFinder
 			return null;
 		}
 		$query = sprintf("select * from geo.places where woeid = %s;", $woeid);
-		$woeid_result = json_decode($this->_queryYql($query));
+		$woeid_result = $this->_queryYql($query);
 		if($woeid_result->query->results == null){
 			return null;
 		}
@@ -100,7 +100,7 @@ class YqlWoeidFinder
 
 		if (!isset($place->locality1) && (isset($place_result->city)) && (isset($place_result->country))) {
 			$query = sprintf("select * from geo.placefinder where text=\"%s, %s\"", $place_result->city, $place_result->country);
-			$city_result = json_decode($this->_queryYql($query));
+			$city_result = $this->_queryYql($query);
 			$mindist = 420000;
 			$minkey = 0;
 			$city_results = $city_result->query->results->Result;
@@ -116,7 +116,7 @@ class YqlWoeidFinder
 			}
 			$city_result = $city_results[$minkey];
 			$query = sprintf("select * from geo.places where woeid = %s;", $city_result->woeid);
-			$city_woeid_result = json_decode($this->_queryYql($query));
+			$city_woeid_result = $this->_queryYql($query);
 			$city_woeid_result = $city_woeid_result->query->results->place;
 
 			$okay_codes = array(7, 22, 10);
@@ -149,7 +149,7 @@ class YqlWoeidFinder
 	 */
 	public function getNeighborsFromWoeid($woeid){
 		$query = sprintf("select woeid from geo.places.neighbors where neighbor_woeid = \"%s\"", $woeid);
-		$result = json_decode($this->_queryYql($query));
+		$result = $this->_queryYql($query);
 		$neighbors = array();
 		$places = array();
 		if(($result->query->results == null) || (count($result->query->results->place) < 1)){
@@ -171,7 +171,7 @@ class YqlWoeidFinder
 	 */
 	public function getSiblingsFromWoeid($woeid){
 		$query = sprintf("select woeid from geo.places.siblings where sibling_woeid = \"%s\"", $woeid);
-		$result = json_decode($this->_queryYql($query));
+		$result = $this->_queryYql($query);
 		$siblings = array();
 		$places = array();
 		if(($result->query->results == null) || (count($result->query->results->place) < 1)){
@@ -193,7 +193,7 @@ class YqlWoeidFinder
 	 */
 	public function getChildrenFromWoeid($woeid){
 		$query = sprintf("select woeid from geo.places.children where parent_woeid = \"%s\"", $woeid);
-		$result = json_decode($this->_queryYql($query));
+		$result = $this->_queryYql($query);
 		$children = array();
 		$places = array();
 		if(($result->query->results == null) || (count($result->query->results->place) < 1)){
@@ -211,21 +211,10 @@ class YqlWoeidFinder
 
 	protected function _queryYql($query)
     {
-        if ($this->browser === false) {
-            $this->browser = new Browser();
-            $client = new Curl();
-            $this->browser->setClient($client);
-        }
-        $key = "yql-query-" . md5($query);
-        if (($this->cache != false) && ($result = $this->cache->get($key))) {
-            return $result;
-        }
-        $yqlquery = sprintf("https://query.yahooapis.com/v1/public/yql?q=%s&format=json", urlencode($query));
-        $result = $this->browser->get($yqlquery)->getContent();
-        if ($this->cache != false) {
-            $this->cache->put($key, $result, 60);
-        }
-        return $result;
+		if($this->adapter == null){
+			$this->adapter = new YqlQueryAdapter();
+		}
+		return $this->adapter->queryYql($query);
     }
 
     protected function _latLongDistance($lat1, $lon1, $lat2, $lon2, $unit = "K")
