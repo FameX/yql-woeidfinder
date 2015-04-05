@@ -42,4 +42,37 @@ class YqlWoeidFinderTest extends PHPUnit_Framework_TestCase {
 			);
 		}
 	}
+
+	public function testGetNeighborsFromWoeid(){
+		try {
+			$neighbors = $this->yqlWoeidFinder->getNeighborsFromWoeid('672683');
+			$this->assertCount(10,$neighbors,"This should have ten neighbors");
+		} catch (Buzz\Exception\RequestException $e){
+			$this->markTestSkipped(
+				'Unable to connect to the YQL service.'
+			);
+		}
+	}
+
+	public function testGetSiblingsFromWoeid(){
+		try {
+			$siblings = $this->yqlWoeidFinder->getSiblingsFromWoeid('672683');
+			$this->assertCount(10,$siblings,"This should have ten siblings");
+		} catch (Buzz\Exception\RequestException $e){
+			$this->markTestSkipped(
+				'Unable to connect to the YQL service.'
+			);
+		}
+	}
+
+	public function testGetChildrenFromWoeid(){
+		try {
+			$children = $this->yqlWoeidFinder->getChildrenFromWoeid('672683');
+			$this->assertCount(10,$children,"This should have ten children");
+		} catch (Buzz\Exception\RequestException $e){
+			$this->markTestSkipped(
+				'Unable to connect to the YQL service.'
+			);
+		}
+	}
 }
