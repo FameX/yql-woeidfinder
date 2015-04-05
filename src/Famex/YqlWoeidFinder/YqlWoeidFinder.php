@@ -143,7 +143,17 @@ class YqlWoeidFinder
 		return $neighbors;
 	}
 
-    protected function _queryYql($query)
+	public function getSiblingsFromWoeid($woeid){
+		$query = sprintf("select woeid from geo.places.siblings where sibling_woeid = \"%s\"", $woeid);
+		$result = json_decode($this->_queryYql($query));
+		$siblings = array();
+		foreach($result->query->results->place as $result){
+			$siblings[] = $this->getPlaceFromWoeid($result->woeid);
+		}
+		return $siblings;
+	}
+
+	protected function _queryYql($query)
     {
         if ($this->browser === false) {
             $this->browser = new Browser();
