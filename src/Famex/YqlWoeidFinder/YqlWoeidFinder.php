@@ -142,7 +142,7 @@ class YqlWoeidFinder
 		$result = json_decode($this->_queryYql($query));
 		$neighbors = array();
 		$places = array();
-		if(count($result->query->results->place) < 1){
+		if(($result->query->results == null) || (count($result->query->results->place) < 1)){
 			return $neighbors;
 		} elseif(count($result->query->results->place) == 1){
 			$places[] = $result->query->results->place;
@@ -164,7 +164,7 @@ class YqlWoeidFinder
 		$result = json_decode($this->_queryYql($query));
 		$siblings = array();
 		$places = array();
-		if(count($result->query->results->place) < 1){
+		if(($result->query->results == null) || (count($result->query->results->place) < 1)){
 			return $siblings;
 		} elseif(count($result->query->results->place) == 1){
 			$places[] = $result->query->results->place;
@@ -186,7 +186,7 @@ class YqlWoeidFinder
 		$result = json_decode($this->_queryYql($query));
 		$children = array();
 		$places = array();
-		if(count($result->query->results->place) < 1){
+		if(($result->query->results == null) || (count($result->query->results->place) < 1)){
 			return $children;
 		} elseif(count($result->query->results->place) == 1){
 			$places[] = $result->query->results->place;
