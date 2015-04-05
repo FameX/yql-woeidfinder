@@ -153,6 +153,24 @@ class YqlWoeidFinder
 		return $siblings;
 	}
 
+	public function getChildrenFromWoeid($woeid){
+		$query = sprintf("select woeid from geo.places.children where parent_woeid = \"%s\"", $woeid);
+		$result = json_decode($this->_queryYql($query));
+		$children = array();
+		$places = array();
+		if(count($result->query->results->place) < 1){
+			return $children;
+		} elseif(count($result->query->results->place) == 1){
+			$places[] = $result->query->results->place;
+		} else {
+			$places = $result->query->results->place;
+		}
+		foreach($places as $result){
+			$children[] = $this->getPlaceFromWoeid($result->woeid);
+		}
+		return $children;
+	}
+
 	protected function _queryYql($query)
     {
         if ($this->browser === false) {
