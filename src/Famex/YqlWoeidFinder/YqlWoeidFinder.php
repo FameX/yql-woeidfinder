@@ -56,8 +56,14 @@ class YqlWoeidFinder
 	 * @return \Famex\YqlWoeidFinder\Place Place
 	 */
 	public function getPlaceFromWoeid($woeid){
+		if((int)$woeid == 0){
+			return null;
+		}
 		$query = sprintf("select * from geo.places where woeid = %s;", $woeid);
 		$woeid_result = json_decode($this->_queryYql($query));
+		if($woeid_result->query->results == null){
+			return null;
+		}
 		$woeid_result = $woeid_result->query->results->place;
 
 		$place = new Place();
