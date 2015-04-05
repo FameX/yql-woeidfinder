@@ -137,7 +137,15 @@ class YqlWoeidFinder
 		$query = sprintf("select woeid from geo.places.neighbors where neighbor_woeid = \"%s\"", $woeid);
 		$result = json_decode($this->_queryYql($query));
 		$neighbors = array();
-		foreach($result->query->results->place as $result){
+		$places = array();
+		if(count($result->query->results->place) < 1){
+			return $neighbors;
+		} elseif(count($result->query->results->place) == 1){
+			$places[] = $result->query->results->place;
+		} else {
+			$places = $result->query->results->place;
+		}
+		foreach($places as $result){
 			$neighbors[] = $this->getPlaceFromWoeid($result->woeid);
 		}
 		return $neighbors;
@@ -147,7 +155,15 @@ class YqlWoeidFinder
 		$query = sprintf("select woeid from geo.places.siblings where sibling_woeid = \"%s\"", $woeid);
 		$result = json_decode($this->_queryYql($query));
 		$siblings = array();
-		foreach($result->query->results->place as $result){
+		$places = array();
+		if(count($result->query->results->place) < 1){
+			return $siblings;
+		} elseif(count($result->query->results->place) == 1){
+			$places[] = $result->query->results->place;
+		} else {
+			$places = $result->query->results->place;
+		}
+		foreach($places as $result){
 			$siblings[] = $this->getPlaceFromWoeid($result->woeid);
 		}
 		return $siblings;
