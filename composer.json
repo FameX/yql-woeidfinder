@@ -7,14 +7,15 @@
 			"role": "Developer"
 		}
 	],
-	"version": "0.3.2",
+	"version": "0.3.3",
 	"require": {
 		"php": ">=5.3.0",
         "kriswallsmith/buzz": ">= 0.11"
 	},
     "require-dev": {
         "illuminate/filesystem": "4.2.*",
-        "illuminate/cache": "4.2.*"
+        "illuminate/cache": "4.2.*",
+        "phpunit/phpunit": "4.6.*"
     },
 	"autoload": {
 		"psr-0": {"Famex\\YqlWoeidFinder": "src/"}
