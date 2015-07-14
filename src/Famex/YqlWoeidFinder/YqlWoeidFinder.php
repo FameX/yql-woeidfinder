@@ -134,6 +134,7 @@ class YqlWoeidFinder
         if ($this->browser === false) {
             $this->browser = new Browser();
             $client = new Curl();
+			$client->setTimeout(30);
             $this->browser->setClient($client);
         }
         $key = "yql-query-" . md5($query);
