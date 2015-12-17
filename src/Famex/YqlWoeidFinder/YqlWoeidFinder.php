@@ -36,6 +36,13 @@ class YqlWoeidFinder
      */
     public function getPlace($lat, $long)
     {
+		// This is probably the silliest thing in the world. But for some reason YQL breaks for completely round numbers.
+		if(!strpos($lat,".",0)){
+			$lat = $lat . ".0";
+		}
+		if(!strpos($long,".",0)){
+			$long = $long . ".0";
+		}
 
         $query = sprintf("select * from geo.placefinder where text=\"%s,%s\" and gflags=\"R\"", $lat, $long);
 
