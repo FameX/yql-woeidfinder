@@ -40,6 +40,15 @@ class YqlWoeidFinder
      */
     public function getPlace($lat, $long)
     {
+		if ($this->browser === false) {
+			$this->browser = new Browser();
+			$client = new Curl();
+			$client->setTimeout(30);
+			$client->setOption(CURLOPT_USERAGENT, "YqlWoeidFinder/0.1");
+			$this->browser->setClient($client);
+		}
+
+
 		$woeidFinder = new WoeidFinder();
 		$yqlQueryAdapter = new YqlQueryAdapter();
 		if($this->cache){
