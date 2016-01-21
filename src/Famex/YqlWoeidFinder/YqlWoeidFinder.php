@@ -3,6 +3,10 @@ namespace Famex\YqlWoeidFinder;
 
 use Buzz\Browser;
 use Buzz\Client\Curl;
+use Famex\WoeidFinder\Adapters\NomatimAdapter;
+use Famex\WoeidFinder\Adapters\YqlQueryAdapter;
+use Famex\WoeidFinder\Place\WoEID as NewWoeid;
+use Famex\WoeidFinder\WoeidFinder;
 
 class YqlWoeidFinder
 {
@@ -36,29 +40,31 @@ class YqlWoeidFinder
      */
     public function getPlace($lat, $long)
     {
-		// This is probably the silliest thing in the world. But for some reason YQL breaks for completely round numbers.
-		if(!strpos($lat,".",0)){
-			$lat = $lat . ".0";
+		$woeidFinder = new WoeidFinder();
+		$yqlQueryAdapter = new YqlQueryAdapter();
+		$yqlQueryAdapter->setCache($this->cache);
+		$yqlQueryAdapter->setBrowser($this->browser);
+		$nominatimAdapter = new NomatimAdapter();
+		$nominatimAdapter->setCache($this->cache);
+		$nominatimAdapter->setBrowser($this->browser);
+		$woeidFinder->setYqlQueryAdapter($yqlQueryAdapter);
+		$woeidFinder->setNomatimAdapter($nominatimAdapter);
+
+
+		$newPlace = $woeidFinder->getPlace($lat,$long);
+
+		$place = new Place();
+
+		$place->setWoeid($this->_convertWoeid($newPlace->getWoeid()));
+
+		$woeid_types = array(
+			'country', 'admin1', 'admin2', 'admin3', 'locality1', 'locality2', 'postal', 'timezone'
+		);
+		foreach($woeid_types as $woeid_type){
+			if(isset($newPlace->$woeid_type)) $place->$woeid_type = $this->_convertWoeid($newPlace->$woeid_type);
 		}
-		if(!strpos($long,".",0)){
-			$long = $long . ".0";
-		}
 
-        $query = sprintf("select * from geo.placefinder where text=\"%s,%s\" and gflags=\"R\"", $lat, $long);
-
-        $place_result = json_decode($this->_queryYql($query));
-
-		if($place_result->query->results == null){
-			throw new \Exception();
-		}
-
-        $place_result = $place_result->query->results->Result;
-
-        if (!isset($place_result->woeid)) {
-            throw new \Exception();
-        }
-
-		return self::getPlaceFromWoeid($place_result->woeid);
+		return $place;
 
     }
 
@@ -103,48 +109,6 @@ class YqlWoeidFinder
 				$place->set($woeid_type, $woeid);
 				unset($woeid);
 			}
-		}
-
-		if (!isset($place->locality1) && (isset($place_result->city)) && (isset($place_result->country))) {
-			$query = sprintf("select * from geo.placefinder where text=\"%s, %s\"", $place_result->city, $place_result->country);
-			$city_result = json_decode($this->_queryYql($query));
-			$mindist = 420000;
-			$minkey = 0;
-			$city_results = $city_result->query->results->Result;
-			if(!is_array($city_results)){
-				$city_results = array($city_results);
-			}
-			foreach ($city_results as $key => $value) {
-				$dist = $this->_latLongDistance($lat,$long,$value->latitude,$value->longitude);
-				if($dist < $mindist){
-					$minkey = $key;
-					$mindist = $dist;
-				}
-			}
-			$city_result = $city_results[$minkey];
-			$query = sprintf("select * from geo.places where woeid = %s;", $city_result->woeid);
-			$city_woeid_result = json_decode($this->_queryYql($query));
-			$city_woeid_result = $city_woeid_result->query->results->place;
-
-			$okay_codes = array(7, 22, 10);
-
-			if (
-				isset($city_woeid_result->placeTypeName) &&
-				isset($city_woeid_result->placeTypeName->code) &&
-				in_array($city_woeid_result->placeTypeName->code, $okay_codes)
-			) {
-				$woeid = new WoEID();
-				$woeid->woeid = $city_woeid_result->woeid;
-				if (isset($city_woeid_result->boundingBox)) $woeid->boundingBox = $city_woeid_result->boundingBox;
-				if (isset($city_woeid_result->centroid)) $woeid->centroid = $city_woeid_result->centroid;
-				if (isset($city_woeid_result->placeTypeName)) $woeid->type = $city_woeid_result->placeTypeName->content;
-				$woeid->content = $city_woeid_result->name;
-
-
-				$place->locality1 = $woeid;
-				unset($woeid);
-			}
-
 		}
 
 		return $place;
@@ -235,6 +199,18 @@ class YqlWoeidFinder
         }
         return $result;
     }
+
+	protected function _convertWoeid(NewWoeid $newWoeid){
+		$oldWoeid = new WoEID();
+		if (isset($newWoeid->code)) $oldWoeid->code = $newWoeid->code;
+		if (isset($newWoeid->type)) $oldWoeid->type = $newWoeid->type;
+		if (isset($newWoeid->woeid)) $oldWoeid->woeid = $newWoeid->woeid;
+		if (isset($newWoeid->content)) $oldWoeid->content = $newWoeid->content;
+		if (isset($newWoeid->centroid)) $oldWoeid->centroid = $newWoeid->centroid;
+		if (isset($newWoeid->boundingBox)) $oldWoeid->boundingBox = $newWoeid->boundingBox;
+
+		return $oldWoeid;
+	}
 
     protected function _latLongDistance($lat1, $lon1, $lat2, $lon2, $unit = "K")
     {

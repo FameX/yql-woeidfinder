@@ -7,10 +7,17 @@
 			"role": "Developer"
 		}
 	],
-	"version": "0.3.6",
+	"version": "0.3.7",
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/FameX/woeidfinder"
+		}
+	],
 	"require": {
 		"php": ">=5.4.0",
-        "kriswallsmith/buzz": ">= 0.11"
+        "kriswallsmith/buzz": ">= 0.11",
+		"famex/woeidfinder": "0.1.*"
 	},
     "require-dev": {
         "illuminate/filesystem": "4.2.*",
