@@ -42,10 +42,14 @@ class YqlWoeidFinder
     {
 		$woeidFinder = new WoeidFinder();
 		$yqlQueryAdapter = new YqlQueryAdapter();
-		$yqlQueryAdapter->setCache($this->cache);
+		if($this->cache){
+			$yqlQueryAdapter->setCache($this->cache);
+		}
 		$yqlQueryAdapter->setBrowser($this->browser);
 		$nominatimAdapter = new NomatimAdapter();
-		$nominatimAdapter->setCache($this->cache);
+		if($this->cache){
+			$nominatimAdapter->setCache($this->cache);
+		}
 		$nominatimAdapter->setBrowser($this->browser);
 		$woeidFinder->setYqlQueryAdapter($yqlQueryAdapter);
 		$woeidFinder->setNomatimAdapter($nominatimAdapter);
