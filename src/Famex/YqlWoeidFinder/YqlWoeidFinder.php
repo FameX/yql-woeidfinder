@@ -44,7 +44,7 @@ class YqlWoeidFinder
 			$long = $long . ".0";
 		}
 
-        $query = sprintf("select * from geo.placefinder where text=\"%s,%s\" and gflags=\"R\"", $lat, $long);
+        $query = sprintf("SELECT * FROM geo.places WHERE text=\"(%s,%s)\"", $lat, $long);
 
         $place_result = json_decode($this->_queryYql($query));
 
@@ -52,7 +52,7 @@ class YqlWoeidFinder
 			throw new \Exception();
 		}
 
-        $place_result = $place_result->query->results->Result;
+        $place_result = $place_result->query->results->place;
 
         if (!isset($place_result->woeid)) {
             throw new \Exception();
