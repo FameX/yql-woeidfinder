@@ -48,7 +48,7 @@ class YqlWoeidFinder
 
         $place_result = json_decode($this->_queryYql($query));
 
-		if($place_result->query->results == null){
+		if(!isset($place_result->query) || ($place_result->query->results == null)){
 			throw new \Exception();
 		}
 
