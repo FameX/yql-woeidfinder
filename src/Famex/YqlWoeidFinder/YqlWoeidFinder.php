@@ -92,11 +92,11 @@ class YqlWoeidFinder
         }
 
         if (!isset($place->locality1) && (isset($place_result->city)) && (isset($place_result->country))) {
-            $query = sprintf("select * from geo.placefinder where text=\"%s, %s\"", $place_result->city, $place_result->country);
+            $query = sprintf("select * from geo.places where text=\"%s, %s\"", $place_result->city, $place_result->country);
             $city_result = json_decode($this->_queryYql($query));
             $mindist = 420000;
             $minkey = 0;
-            $city_results = $city_result->query->results->Result;
+            $city_results = $city_result->query->results->place;
             if(!is_array($city_results)){
                 $city_results = array($city_results);
             }
