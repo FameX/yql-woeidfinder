@@ -33,6 +33,7 @@ class YqlWoeidFinder
      * @param $lat
      * @param $long
      * @return \Famex\YqlWoeidFinder\Place Place
+	 * @throws \Famex\YqlWoeidFinder\Exception Exception
      */
     public function getPlace($lat, $long)
     {
@@ -49,13 +50,13 @@ class YqlWoeidFinder
         $place_result = json_decode($this->_queryYql($query));
 
 		if(!isset($place_result->query) || ($place_result->query->results == null)){
-			throw new \Exception();
+			throw new Exception(Exception::NO_QUERY_RESULT);
 		}
 
         $place_result = $place_result->query->results->place;
 
         if (!isset($place_result->woeid)) {
-            throw new \Exception();
+            throw new Exception(Exception::NO_WOEID);
         }
 
 		return self::getPlaceFromWoeid($place_result->woeid);
