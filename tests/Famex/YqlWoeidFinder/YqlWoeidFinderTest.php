@@ -14,8 +14,6 @@ class YqlWoeidFinderTest extends PHPUnit_Framework_TestCase {
 			$this->assertInstanceOf('Famex\YqlWoeidFinder\WoEID',$place->getWoeid(),"The place object does not have a woeid object");
 			$this->assertEquals('55812235',$place->getWoeid()->woeid,'The place object has a wrong woeid for this lat/long');
 
-			$this->setExpectedException(Exception::class);
-			$place = $this->yqlWoeidFinder->getPlace(0,0);
 		} catch (Buzz\Exception\RequestException $e){
 			$this->markTestSkipped(
 				'Unable to connect to the YQL service.'
@@ -50,6 +48,18 @@ class YqlWoeidFinderTest extends PHPUnit_Framework_TestCase {
 			);
 		}
 
+	}
+
+	public function testNullPlace(){
+		try {
+			$this->setExpectedException(Exception::class);
+			$place = $this->yqlWoeidFinder->getPlace(0,0);
+
+		} catch (Buzz\Exception\RequestException $e){
+			$this->markTestSkipped(
+				'Unable to connect to the YQL service.'
+			);
+		}
 	}
 
 	public function testGetPlaceFromWoeid(){
