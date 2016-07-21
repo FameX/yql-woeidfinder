@@ -68,7 +68,7 @@ class YqlWoeidFinderTest extends PHPUnit_Framework_TestCase {
 	public function testGetNeighborsFromWoeid(){
 		try {
 			$neighbors = $this->yqlWoeidFinder->getNeighborsFromWoeid('672683');
-			$this->assertCount(10,$neighbors,"This should have ten neighbors");
+			$this->assertContainsOnlyInstancesOf(Famex\YqlWoeidFinder\Place::class,$neighbors);
 		} catch (Buzz\Exception\RequestException $e){
 			$this->markTestSkipped(
 				'Unable to connect to the YQL service.'
@@ -79,7 +79,7 @@ class YqlWoeidFinderTest extends PHPUnit_Framework_TestCase {
 	public function testGetSiblingsFromWoeid(){
 		try {
 			$siblings = $this->yqlWoeidFinder->getSiblingsFromWoeid('672683');
-			$this->assertCount(10,$siblings,"This should have ten siblings");
+			$this->assertContainsOnlyInstancesOf(Famex\YqlWoeidFinder\Place::class,$siblings);
 		} catch (Buzz\Exception\RequestException $e){
 			$this->markTestSkipped(
 				'Unable to connect to the YQL service.'
@@ -90,7 +90,7 @@ class YqlWoeidFinderTest extends PHPUnit_Framework_TestCase {
 	public function testGetChildrenFromWoeid(){
 		try {
 			$children = $this->yqlWoeidFinder->getChildrenFromWoeid('672683');
-			$this->assertCount(10,$children,"This should have ten children");
+			$this->assertContainsOnlyInstancesOf(Famex\YqlWoeidFinder\Place::class,$children);
 		} catch (Buzz\Exception\RequestException $e){
 			$this->markTestSkipped(
 				'Unable to connect to the YQL service.'
