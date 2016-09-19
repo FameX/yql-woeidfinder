@@ -6,7 +6,6 @@ use Buzz\Client\Curl;
 
 class YqlWoeidFinder
 {
-    protected $cache = false;
     protected $browser = false;
 
     public function getBrowser()
@@ -17,16 +16,6 @@ class YqlWoeidFinder
     public function setBrowser($browser)
     {
         $this->browser = $browser;
-    }
-
-    public function getCache()
-    {
-        return $this->cache;
-    }
-
-    public function setCache($cache)
-    {
-        $this->cache = $cache;
     }
 
     /**
@@ -183,15 +172,8 @@ class YqlWoeidFinder
 			$client->setTimeout(30);
             $this->browser->setClient($client);
         }
-        $key = "yql-query-" . md5($query);
-        if (($this->cache != false) && ($result = $this->cache->get($key))) {
-            return $result;
-        }
         $yqlquery = sprintf("https://query.yahooapis.com/v1/public/yql?q=%s&format=json", urlencode($query));
         $result = $this->browser->get($yqlquery)->getContent();
-        if ($this->cache != false) {
-            $this->cache->put($key, $result, 60);
-        }
         return $result;
     }
 
