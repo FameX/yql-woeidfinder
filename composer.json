@@ -7,7 +7,7 @@
 			"role": "Developer"
 		}
 	],
-	"version": "0.3.8",
+	"version": "0.3.9",
 	"require": {
 		"php": ">=5.4.0",
         "kriswallsmith/buzz": "^0.16"
