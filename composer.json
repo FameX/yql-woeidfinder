@@ -21,5 +21,6 @@
     },
 	"autoload": {
 		"psr-0": {"Famex\\YqlWoeidFinder": "src/"}
-	}
+	},
+	"abandoned": true
 }
